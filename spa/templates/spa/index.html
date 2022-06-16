@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        td {
+            border:1px solid black;
+            padding: 0.5em;
+            background: whitesmoke;
+        }
+    </style>
+
+    <script>
+        function sendInput(id, name, checked) {
+            let formData = new FormData();
+            formData.append('name', name);
+            formData.append('checked', checked);
+
+            csrfmiddlewaretoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+            formData.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
+
+
+            fetch(`user/${id}`, {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response); // empty response
+
+            return false;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('input').forEach(input => {
+                input.onchange = () => {
+                    sendInput(input.dataset.id, input.name, input.checked);
+                }
+            });
+        });
+    </script>
+
+</head>
+
+<body>
+    <h1>Users</h1>
+
+    <table>
+        {% csrf_token %}
+        {% for user in users %}
+        <tr>
+            <td>
+                {{user.name}}
+            </td>
+            <td>
+                present
+                <input type="checkbox" data-id="{{user.id}}" name="present" {% if user.present %} checked {% endif %}>
+            </td>
+            <td>
+                online
+                <input type="checkbox" data-id="{{user.id}}" name="online" {% if user.online %} checked {% endif %}>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+
+</html>
